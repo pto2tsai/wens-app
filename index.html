@@ -11,26 +11,21 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="生產作業管理">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="theme-color" content="#132b3a">
+<meta name="theme-color" content="#ffffff">
 <style>
-  html,body{margin:0;height:100%;background:#e6ecef;font-family:"PingFang TC","Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif}
+  html,body{margin:0;height:100%;background:#fff;font-family:"PingFang TC","Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif}
   body{padding-top:env(safe-area-inset-top);box-sizing:border-box}
   #app{display:block;width:100%;height:100%;border:0}
-  #splash{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#132b3a;color:#fff;transition:opacity .3s}
-  #splash img{width:112px;height:112px;border-radius:26px;background:#fff;padding:6px;box-sizing:border-box}
-  #splash b{font-size:24px;letter-spacing:.06em}
-  #splash small{font-size:13px;letter-spacing:.1em;opacity:.8}
-  #splash small span{color:#5fc3ff}
+  #splash{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:#fff;transition:opacity .35s}
+  #splash img{width:min(84vw,460px);height:auto}
   #splash.off{opacity:0;pointer-events:none}
-  #slow{display:none;font-size:14px;opacity:.8;text-align:center;padding:0 24px}
-  #slow a{color:#5fc3ff}
+  #slow{display:none;font-size:15px;color:#5b6f7b;text-align:center;padding:0 24px}
+  #slow a{color:#1f5f93}
 </style>
 </head>
 <body>
 <div id="splash">
-  <img src="icon-192.png" alt="">
-  <b>生產作業管理</b>
-  <small>WENS <span>PRODUCTION OPS</span></small>
+  <img src="splash.webp" alt="生產作業管理 WENS PRODUCTION OPS">
   <div id="slow">讀取比較久……<br>一直沒出現的話，<a id="direct" href="#" target="_blank" rel="noopener">點這裡直接打開</a></div>
 </div>
 <iframe id="app" title="生產作業管理" allow="camera; clipboard-write; screen-wake-lock"></iframe>
@@ -44,7 +39,9 @@ const APP_URL = 'https://script.google.com/macros/s/AKfycbzRzQRdto4O0jiqS4Q_MYcZ
 const frame = document.getElementById('app'), splash = document.getElementById('splash');
 const base = APP_URL.split('?')[0];
 document.getElementById('direct').href = APP_URL;
-frame.addEventListener('load', () => splash.classList.add('off'));
+// 開場畫面：系統頁面真的出現（打招呼）才收起來；萬一沒打招呼，外框載入 4 秒後也收起來
+const done = () => splash.classList.add('off');
+frame.addEventListener('load', () => setTimeout(done, 4000));
 frame.src = APP_URL;
 setTimeout(() => { document.getElementById('slow').style.display = 'block'; }, 12000);
 
@@ -55,7 +52,7 @@ window.addEventListener('message', e => {
   if (!/\.googleusercontent\.com$|\.google\.com$/.test(host)) return;
   const d = e.data;
   if (!d || typeof d !== 'object') return;
-  if (d.wens === 'hello' && e.source) e.source.postMessage({wens: 'ack'}, '*');
+  if (d.wens === 'hello' && e.source) { e.source.postMessage({wens: 'ack'}, '*'); done(); }
   if (d.wens === 'go') frame.src = APP_URL + (d.page ? '?page=' + encodeURIComponent(d.page) : '');
 });
 </script>
