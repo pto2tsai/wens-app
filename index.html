@@ -48,13 +48,15 @@ frame.addEventListener('load', () => splash.classList.add('off'));
 frame.src = APP_URL;
 setTimeout(() => { document.getElementById('slow').style.display = 'block'; }, 12000);
 
-// 工具頁點了連結：同一個系統的就在 App 裡換頁；別的系統（例如 MES）另開視窗
+// 系統頁面打招呼 → 回應它「你在 App 裡」；之後點首頁、前台、後台，就在 App 裡換頁
 window.addEventListener('message', e => {
-  if (!/\.googleusercontent\.com$|\.google\.com$/.test(new URL(e.origin).hostname)) return;
+  let host = '';
+  try { host = new URL(e.origin).hostname; } catch (err) { return; }
+  if (!/\.googleusercontent\.com$|\.google\.com$/.test(host)) return;
   const d = e.data;
-  if (!d || d.wens !== 'go' || typeof d.url !== 'string') return;
-  if (d.url.split('?')[0] === base) frame.src = d.url;
-  else window.open(d.url, '_blank', 'noopener');
+  if (!d || typeof d !== 'object') return;
+  if (d.wens === 'hello' && e.source) e.source.postMessage({wens: 'ack'}, '*');
+  if (d.wens === 'go') frame.src = APP_URL + (d.page ? '?page=' + encodeURIComponent(d.page) : '');
 });
 </script>
 </body>
